@@ -1,0 +1,15 @@
+{
+    "title": "Plaid",
+    "config": {
+      "step": {
+        "init": {
+          "title": "Input credentials",
+          "data": {
+            "client_id": "Client Id",
+            "client_secret": "Client Secret",
+            "token": "Token"
+          }
+        }
+      }
+    }
+  }

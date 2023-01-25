@@ -72,6 +72,11 @@ class AccountSensor(SensorEntity):
         self._attr_state_class = SensorStateClass.TOTAL
 
     @property
+    def available(self):
+        """Return the name of the sensor."""
+        return self._plaid_data.available
+
+    @property
     def name(self):
         """Return the name of the sensor."""
         return self._name

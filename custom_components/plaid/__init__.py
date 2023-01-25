@@ -26,7 +26,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = [Platform.SENSOR]
-MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=5)
+MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=30)
 
 
 #PLATFORM_SCHEMA = vol.Schema({
@@ -58,7 +58,9 @@ class PlaidData:
         """Init the coinbase data object."""
 
         self.config = config
+        self.available = False
         self.accounts = None
+        self.transactions = None
         self.last_cursor = None
         self.headers = { 'PLAID-CLIENT-ID': config['client_id'], 'PLAID-SECRET': config['secret'], 'Content-Type': 'application/json' }
         self.access_token = config['access_token']
@@ -66,7 +68,12 @@ class PlaidData:
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
         """Get the latest data from plaid."""
-        self.accounts = get_accounts(self.headers, self.access_token)
+        account_data = get_accounts(self.headers, self.access_token)
+        if account_data[0] is False:
+            self.available = False
+            return
+        self.available = True
+        self.accounts = account_data[1]
         transactions = get_transactions(self.headers, self.access_token, self.last_cursor)
         self.transactions = transactions[0]
         self.last_cursor = transactions[1]
@@ -148,9 +155,14 @@ def get_accounts(headers, access_token):
     from requests import post
     data = { 'access_token': access_token }
     response = post('https://development.plaid.com/accounts/balance/get', headers=headers, json=data)
-    accounts = response.json()[API_ACCOUNTS]
+    try:
+        accounts = response.json()[API_ACCOUNTS]
 
-    return accounts
+        return (True, accounts)
+    except KeyError:
+        _LOGGER.exception('Failed to get Plaid data: %s (%s): %s', response.error_code, response.error_type, response.error_message)
+        return (False, [])
+
 
 def get_transactions(headers, access_token, lastCursor=None):
     """Handle paginated accounts."""

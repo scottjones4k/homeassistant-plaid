@@ -155,12 +155,13 @@ def get_accounts(headers, access_token):
     from requests import post
     data = { 'access_token': access_token }
     response = post('https://development.plaid.com/accounts/balance/get', headers=headers, json=data)
+    responseJson = response.json()
     try:
-        accounts = response.json()[API_ACCOUNTS]
+        accounts = responseJson[API_ACCOUNTS]
 
         return (True, accounts)
     except KeyError:
-        _LOGGER.exception('Failed to get Plaid data: %s (%s): %s', response.error_code, response.error_type, response.error_message)
+        _LOGGER.exception('Failed to get Plaid data: %s (%s): %s', responseJson['error_code'], responseJson['error_type'], responseJson['error_message'])
         return (False, [])
 
 

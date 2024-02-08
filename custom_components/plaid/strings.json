@@ -2,7 +2,7 @@
     "title": "Plaid",
     "config": {
       "step": {
-        "init": {
+        "user": {
           "title": "Input credentials",
           "data": {
             "client_id": "Client Id",

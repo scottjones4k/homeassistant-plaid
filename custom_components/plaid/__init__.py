@@ -79,7 +79,7 @@ class PlaidData:
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
         """Get the latest data from plaid."""
-        account_data = get_accounts(self.access_token)
+        account_data = get_accounts(self.client, self.access_token)
         if account_data[0] is False:
             self.available = False
             return
@@ -161,7 +161,7 @@ async def update_listener(hass: HomeAssistant, config_entry: ConfigEntry) -> Non
     #         registry.async_remove(entity.entity_id)
 
 
-def get_accounts(access_token):
+def get_accounts(client, access_token):
     """Handle paginated accounts."""
     import plaid
     from plaid.model.accounts_balance_get_request import AccountsBalanceGetRequest

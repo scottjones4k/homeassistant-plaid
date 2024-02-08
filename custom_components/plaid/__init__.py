@@ -80,11 +80,11 @@ class PlaidData:
     def update(self):
         """Get the latest data from plaid."""
         account_data = get_accounts(self.client, self.access_token)
-        if account_data[0] is False:
+        if len(account_data) == 0:
             self.available = False
             return
         self.available = True
-        self.accounts = account_data[1]
+        self.accounts = account_data
         #transactions = get_transactions(self.headers, self.access_token, self.last_cursor)
         #self.transactions = transactions[0]
         #self.last_cursor = transactions[1]

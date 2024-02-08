@@ -55,15 +55,26 @@ class PlaidData:
     """Get the latest data and update the states."""
 
     def __init__(self, config):
-        """Init the coinbase data object."""
+        """Init the plaid data object."""
+        import plaid
+        from plaid.api import plaid_api
 
         self.config = config
         self.available = False
         self.accounts = None
         self.transactions = None
         self.last_cursor = None
-        self.headers = { 'PLAID-CLIENT-ID': config['client_id'], 'PLAID-SECRET': config['secret'], 'Content-Type': 'application/json' }
         self.access_token = config['access_token']
+        configuration = plaid.Configuration(
+            host=plaid.Environment.Sandbox,
+            api_key={
+                'clientId': config['client_id'],
+                'secret': config['secret'],
+                'plaidVersion': '2020-09-14'
+            }
+        )
+        api_client = plaid.ApiClient(configuration)
+        self.client = plaid_api.PlaidApi(api_client)
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
@@ -74,9 +85,9 @@ class PlaidData:
             return
         self.available = True
         self.accounts = account_data[1]
-        transactions = get_transactions(self.headers, self.access_token, self.last_cursor)
-        self.transactions = transactions[0]
-        self.last_cursor = transactions[1]
+        #transactions = get_transactions(self.headers, self.access_token, self.last_cursor)
+        #self.transactions = transactions[0]
+        #self.last_cursor = transactions[1]
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Plaid component."""
@@ -152,16 +163,19 @@ async def update_listener(hass: HomeAssistant, config_entry: ConfigEntry) -> Non
 
 def get_accounts(headers, access_token):
     """Handle paginated accounts."""
-    from requests import post
-    data = { 'access_token': access_token }
-    response = post('https://development.plaid.com/accounts/balance/get', headers=headers, json=data)
-    responseJson = response.json()
+    import plaid
+    from plaid.model.accounts_balance_get_request import AccountsBalanceGetRequest
+    request = AccountsBalanceGetRequest(
+        access_token=access_token
+    )
+
     try:
-        accounts = responseJson[API_ACCOUNTS]
+        response = client.accounts_balance_get(request)
+        accounts = response.accounts
 
         return (True, accounts)
-    except KeyError:
-        _LOGGER.exception('Failed to get Plaid data: %s (%s): %s', responseJson['error_code'], responseJson['error_type'], responseJson['error_message'])
+    except plaid.ApiException as e:
+        _LOGGER.exception('Failed to get Plaid data: %s', e.body)
         return (False, [])
 
 

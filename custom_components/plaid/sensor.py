@@ -138,7 +138,7 @@ def map_transaction(transaction):
         'Name': transaction['name'],
         'Currency': transaction['iso_currency_code'],
         'Date Time': transaction['datetime'],
-        'Type': transaction['transaction_code'],
+        'Type': str(transaction['transaction_code']),
         'Pending': transaction['pending'],
         'Transaction Id': transaction['transaction_id']
     }

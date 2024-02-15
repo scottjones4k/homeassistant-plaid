@@ -57,9 +57,9 @@ class AccountSensor(SensorEntity):
                 self._current_balance = account.balances.current
                 self._balance_limit = account.balances.limit
                 
-                #addedTransactions = list(filter(lambda t: t[API_ACCOUNT_ID] == account[API_ACCOUNT_ID], self._plaid_data.transactions))
-                #addedTransactions.sort(key=lambda t: t['datetime'], reverse=True) #newest first
-                #self._transactions = list(map(map_transaction, addedTransactions[:10]))
+                addedTransactions = list(filter(lambda t: t[API_ACCOUNT_ID] == account[API_ACCOUNT_ID], self._plaid_data.transactions))
+                addedTransactions.sort(key=lambda t: t['datetime'], reverse=True) #newest first
+                self._transactions = list(map(map_transaction, addedTransactions[:10]))
                 break
         self._attr_state_class = SensorStateClass.TOTAL
 
@@ -101,7 +101,7 @@ class AccountSensor(SensorEntity):
             'Current Balance': self._current_balance,
             'Balance Limit': self._balance_limit,
             'Mask': self._mask
-            # 'Transactions': self._transactions
+            'Transactions': self._transactions
         }
 
     def update(self):
@@ -120,15 +120,15 @@ class AccountSensor(SensorEntity):
                 self._current_balance = account.balances.current
                 self._balance_limit = account.balances.limit
                 
-                #addedTransactions = self._transactions + list(map(map_transaction, list(filter(lambda t: t[API_ACCOUNT_ID] == account[API_ACCOUNT_ID], self._plaid_data.transactions))))
+                addedTransactions = self._transactions + list(map(map_transaction, list(filter(lambda t: t[API_ACCOUNT_ID] == account[API_ACCOUNT_ID], self._plaid_data.transactions))))
                 
-                #transactions = []
-                #for t in addedTransactions:
-                #    if all(tr['Transaction Id'] != t['Transaction Id'] for tr in transactions):
-                #        transactions.append(t)
-                #transactions.sort(key=lambda t: t['Date Time'], reverse=True) #newest first
+                transactions = []
+                for t in addedTransactions:
+                    if all(tr['Transaction Id'] != t['Transaction Id'] for tr in transactions):
+                        transactions.append(t)
+                transactions.sort(key=lambda t: t['Date Time'], reverse=True) #newest first
                 
-                #self._transactions = transactions[:10]
+                self._transactions = transactions[:10]
                 break
 
 def map_transaction(transaction):

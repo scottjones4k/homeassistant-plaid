@@ -85,9 +85,9 @@ class PlaidData:
             return
         self.available = True
         self.accounts = account_data[1]
-        #transactions = get_transactions(self.headers, self.access_token, self.last_cursor)
-        #self.transactions = transactions[0]
-        #self.last_cursor = transactions[1]
+        transactions = get_transactions(self.headers, self.access_token, self.last_cursor)
+        self.transactions = transactions[0]
+        self.last_cursor = transactions[1]
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Plaid component."""
@@ -181,15 +181,25 @@ def get_accounts(client, access_token):
 
 def get_transactions(headers, access_token, lastCursor=None):
     """Handle paginated accounts."""
-    from requests import post
-    data = { 'access_token': access_token }
+    import plaid
+    from plaid.model.transactions_sync_request import TransactionsSyncRequest
+
+    request = TransactionsSyncRequest(
+        access_token=access_token,
+    )
     if lastCursor!=None:
-        data['cursor']=lastCursor
-    response = post('https://development.plaid.com/transactions/sync', headers=headers, json=data)
-    responseJson = response.json()
-    transactions = responseJson['added']
-    if responseJson['has_more']:
-        moreTransactions = get_transactions(headers,access_token,responseJson['next_cursor'])
-        return (transactions + moreTransactions[0], moreTransactions[1])
-    return (transactions, responseJson['next_cursor'])
+        request['cursor']=lastCursor
+    response = client.transactions_sync(request)
+    transactions = response['added']
+
+    # the transactions in the response are paginated, so make multiple calls while incrementing the cursor to
+    # retrieve all transactions
+    while (response['has_more']):
+        request = TransactionsSyncRequest(
+            access_token=access_token,
+            cursor=response['next_cursor']
+        )
+        response = client.transactions_sync(request)
+        transactions += response['added']
+    return (transactions, response['next_cursor'])
 

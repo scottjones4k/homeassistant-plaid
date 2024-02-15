@@ -67,7 +67,7 @@ class AccountSensor(SensorEntity):
     @property
     def available(self):
         """Return the name of the sensor."""
-        return self._plaid_data.available
+        return True # self._plaid_data.available
 
     @property
     def name(self):

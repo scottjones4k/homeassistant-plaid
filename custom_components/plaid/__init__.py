@@ -62,7 +62,7 @@ class PlaidData:
         self.config = config
         self.available = False
         self.accounts = None
-        self.transactions = None
+        self.transactions = []
         self.last_cursor = None
         self.access_token = config['access_token']
         configuration = plaid.Configuration(
@@ -85,9 +85,9 @@ class PlaidData:
             return
         self.available = True
         self.accounts = account_data[1]
-        transactions = get_transactions(self.client, self.access_token, self.last_cursor)
-        self.transactions = transactions[0]
-        self.last_cursor = transactions[1]
+        # transactions = get_transactions(self.client, self.access_token, self.last_cursor)
+        # self.transactions = transactions[0]
+        # self.last_cursor = transactions[1]
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Plaid component."""

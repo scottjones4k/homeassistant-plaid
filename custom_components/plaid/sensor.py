@@ -116,8 +116,8 @@ class AccountSensor(SensorEntity):
                     f"plaid-{account.account_id}"
                 )
                 self._state = account.balances.available
-                self._unit_of_measurement = account.balances.currency
-                self._current_balance = account.balances.iso_currency_code
+                self._unit_of_measurement = account.balances.iso_currency_code
+                self._current_balance = account.balances.current
                 self._balance_limit = account.balances.limit
                 
                 #addedTransactions = self._transactions + list(map(map_transaction, list(filter(lambda t: t[API_ACCOUNT_ID] == account[API_ACCOUNT_ID], self._plaid_data.transactions))))

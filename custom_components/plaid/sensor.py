@@ -133,12 +133,11 @@ class AccountSensor(SensorEntity):
                 break
 
 def map_transaction(transaction):
-    import datetime
     return {
         'Amount': transaction['amount'],
         'Name': transaction['name'],
         'Currency': transaction['iso_currency_code'],
-        'Date Time': datetime.datetime.fromisoformat(transaction['datetime'][:-1]),
+        'Date Time': transaction['datetime'],
         'Type': transaction['transaction_code'],
         'Pending': transaction['pending'],
         'Transaction Id': transaction['transaction_id']

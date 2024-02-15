@@ -100,7 +100,7 @@ class AccountSensor(SensorEntity):
             ATTR_ATTRIBUTION: ATTRIBUTION,
             'Current Balance': self._current_balance,
             'Balance Limit': self._balance_limit,
-            'Mask': self._mask
+            'Mask': self._mask,
             'Transactions': self._transactions
         }
 

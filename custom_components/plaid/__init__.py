@@ -64,12 +64,12 @@ class PlaidData:
         self.accounts = None
         self.transactions = None
         self.last_cursor = None
-        self.access_token = config[CONF_TOKEN]
+        self.access_token = config['access_token']
         configuration = plaid.Configuration(
             host=plaid.Environment.Sandbox,
             api_key={
-                'clientId': config[CONF_CLIENT_ID],
-                'secret': config[CONF_CLIENT_SECRET],
+                'clientId': config['client_id'],
+                'secret': config['secret'],
                 'plaidVersion': '2020-09-14'
             }
         )

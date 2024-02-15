@@ -66,7 +66,7 @@ class PlaidData:
         self.last_cursor = None
         self.access_token = config['access_token']
         configuration = plaid.Configuration(
-            host=plaid.Environment.Sandbox,
+            host=plaid.Environment.Development,
             api_key={
                 'clientId': config['client_id'],
                 'secret': config['secret'],

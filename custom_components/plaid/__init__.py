@@ -85,7 +85,7 @@ class PlaidData:
             return
         self.available = True
         self.accounts = account_data[1]
-        transactions = get_transactions(self.headers, self.access_token, self.last_cursor)
+        transactions = get_transactions(self.client, self.access_token, self.last_cursor)
         self.transactions = transactions[0]
         self.last_cursor = transactions[1]
 
@@ -179,7 +179,7 @@ def get_accounts(client, access_token):
         return (False, [])
 
 
-def get_transactions(headers, access_token, lastCursor=None):
+def get_transactions(client, access_token, lastCursor=None):
     """Handle paginated accounts."""
     import plaid
     from plaid.model.transactions_sync_request import TransactionsSyncRequest

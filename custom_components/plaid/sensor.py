@@ -11,6 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
     DOMAIN,
+    API_ACCOUNT_ID
 )
 
 _LOGGER = logging.getLogger(__name__)

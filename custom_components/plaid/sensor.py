@@ -1,4 +1,4 @@
-"""Support for Coinbase sensors."""
+"""Support for Plaid sensors."""
 from __future__ import annotations
 
 import logging
@@ -100,8 +100,8 @@ class AccountSensor(SensorEntity):
             ATTR_ATTRIBUTION: ATTRIBUTION,
             'Current Balance': self._current_balance,
             'Balance Limit': self._balance_limit,
-            'Mask': self._mask,
-            'Transactions': self._transactions
+            'Mask': self._mask
+            # 'Transactions': self._transactions
         }
 
     def update(self):

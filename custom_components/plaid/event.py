@@ -66,7 +66,7 @@ class PlaidTransactionEventEntity(EventEntity):
         await super().async_added_to_hass()
 
         # Register event callback
-        self.controller.register_event(
+        self._plaid_data.register_event(
             self._account_id, self._event_callback
         )
 

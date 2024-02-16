@@ -71,6 +71,7 @@ class PlaidTransactionEventEntity(EventEntity):
         )
 
     def _event_callback(self, transaction) -> None:
+        _LOGGER.debug("Transaction event fired %s: %s", transaction.account_id, self._account_id)
         if transaction.account_id == self._account_id:
             self._trigger_event(str(transaction.transaction_code), map_transaction(transaction))
             self.schedule_update_ha_state()

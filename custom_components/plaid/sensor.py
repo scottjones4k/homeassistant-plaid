@@ -34,50 +34,35 @@ async def async_setup_entry(
     entities: list[SensorEntity] = []
 
     for account in instance.accounts:
-        entities.append(AccountSensor(instance, account.mask))
+        entities.append(AccountSensor(instance, account))
     async_add_entities(entities)
 
 
 class AccountSensor(SensorEntity):
     """Representation of a Plaid sensor."""
 
-    def __init__(self, plaid_data, mask):
+    def __init__(self, plaid_data, account):
         """Initialize the sensor."""
         self._plaid_data = plaid_data
-        self._mask = mask
-        for account in self._plaid_data.accounts:
-            if (
-                account.mask == self._mask
-            ):
-                self._name = f"{account.name} Balance"
-                self._id = (
-                    f"plaid-{account.account_id}"
-                )
-                self._state = account.balances.available
-                self._unit_of_measurement = account.balances.iso_currency_code
-                self._current_balance = account.balances.current
-                self._balance_limit = account.balances.limit
-                
-                addedTransactions = list(filter(lambda t: t[API_ACCOUNT_ID] == account[API_ACCOUNT_ID], self._plaid_data.transactions))
-                addedTransactions.sort(key=lambda t: t['datetime'], reverse=True) #newest first
-                self._transactions = list(map(map_transaction, addedTransactions[:10]))
-                break
+        self._mask = account.mask
+
+        self._state = account.balances.available
+        self._unit_of_measurement = account.balances.iso_currency_code
+        self._current_balance = account.balances.current
+        self._balance_limit = account.balances.limit
+        
+        addedTransactions = list(filter(lambda t: t[API_ACCOUNT_ID] == account[API_ACCOUNT_ID], self._plaid_data.transactions))
+        addedTransactions.sort(key=lambda t: t['datetime'], reverse=True) #newest first
+        self._transactions = list(map(map_transaction, addedTransactions[:10]))
+        self.entity_id = ENTITY_ID_FORMAT.format(f"plaid-{account.name}-balance")
+        self._attr_name = f"{account.name} Balance"
+        self._attr_unique_id = self.entity_id
         self._attr_state_class = SensorStateClass.TOTAL
 
     @property
     def available(self):
         """Return the name of the sensor."""
         return True # self._plaid_data.available
-
-    @property
-    def name(self):
-        """Return the name of the sensor."""
-        return self._name
-
-    @property
-    def unique_id(self):
-        """Return the Unique ID of the sensor."""
-        return self._id
 
     @property
     def native_value(self):
@@ -112,10 +97,6 @@ class AccountSensor(SensorEntity):
             if (
                 account.mask == self._mask
             ):
-                self._name = f"Plaid {account.name}"
-                self._id = (
-                    f"plaid-{account.account_id}"
-                )
                 self._state = account.balances.available
                 self._unit_of_measurement = account.balances.iso_currency_code
                 self._current_balance = account.balances.current

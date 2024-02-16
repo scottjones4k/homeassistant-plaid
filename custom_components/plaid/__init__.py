@@ -86,8 +86,11 @@ class PlaidData:
             return
         self.available = True
         self.accounts = account_data[1]
+        _LOGGER.debug("Got accounts")
+
         transactions = get_transactions(self.client, self.access_token, self.last_cursor)
         self.transactions = transactions[0]
+        _LOGGER.debug("Got transactions %d: %s", len(transactions[0]), self.last_cursor)
         if (self.last_cursor != None):
             for transaction in self.transactions:
                 for callback in self._event_callbacks[transaction.account_id]:

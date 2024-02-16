@@ -34,7 +34,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Plaid event entities."""
-    instance = hass.data[DOMAIN][config_entry.entry_id]
+    instance = hass.data[DOMAIN][entry.entry_id]
 
     entities: list[PlaidTransactionEventEntity] = []
 

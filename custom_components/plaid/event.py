@@ -53,7 +53,7 @@ class PlaidTransactionEventEntity(EventEntity):
         self._mask = mask
         self._account_id = account.account_id
 
-        self.entity_id = ENTITY_ID_FORMAT.format(f"plaid-{account.account_id}-transactions")
+        self.entity_id = ENTITY_ID_FORMAT.format(f"plaid-{account.name}-transactions")
 
         self._button = mask
 

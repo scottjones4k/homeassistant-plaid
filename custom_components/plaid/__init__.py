@@ -25,7 +25,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.EVENT]
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=30)
 
 
@@ -64,6 +64,7 @@ class PlaidData:
         self.accounts = None
         self.transactions = []
         self.last_cursor = None
+        self._event_callbacks: dict[int, list[Callable[[FibaroEvent], None]]] = {}
         self.access_token = config['access_token']
         configuration = plaid.Configuration(
             host=plaid.Environment.Development,
@@ -87,7 +88,21 @@ class PlaidData:
         self.accounts = account_data[1]
         transactions = get_transactions(self.client, self.access_token, self.last_cursor)
         self.transactions = transactions[0]
+        if (self.last_cursor != None):
+            for transaction in self.transactions:
+                for callback in self._event_callbacks[transaction.account_id]:
+                    callback(transaction)
         self.last_cursor = transactions[1]
+
+    def register_event(
+        self, account: str, callback
+    ) -> None:
+        """Register device with a callback for central scene events.
+
+        The callback receives one parameter with the event.
+        """
+        device_callbacks = self._event_callbacks.setdefault(account, [])
+        device_callbacks.append(callback)
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Plaid component."""
